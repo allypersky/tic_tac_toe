@@ -25,7 +25,7 @@ class TicTacToe:
                 j += 1
             j = 0
             i += 1
-        rendered_board = '  | 0 | 1 | 2 \n ------------- \n 0| '+display_board[0][0]+' | '+display_board[0][1]+' | '+display_board[0][2] + '\n 1| '+display_board[1][0]+' | '+display_board[1][1]+' | '+display_board[1][2]+ '\n 2| '+display_board[2][0]+' | '+display_board[2][1]+' | '+display_board[2][2]
+        rendered_board = '  | 0 | 1 | 2 \n ------------- \n 0| '+display_board[0][0]+' | '+display_board[0][1]+' | '+display_board[0][2] + '\n 1| '+display_board[1][0]+' | '+display_board[1][1]+' | '+display_board[1][2]+ '\n 2| '+display_board[2][0]+' | '+display_board[2][1]+' | '+display_board[2][2]+ '\n'
         return rendered_board
 
     def get_move(self):
@@ -85,7 +85,7 @@ class TicTacToe:
                 return "Draw!"
         return None
     
-    def random_ai(self, board, current_player):
+    def find_valid_moves(self, board):
         valid_moves = []
         i = 0
         j = 0
@@ -96,32 +96,36 @@ class TicTacToe:
                 i += 1
             i = 0
             j += 1
-        random_move_coords = random.choice(valid_moves)
+        return valid_moves
+
+    def random_ai(self, board, current_player):
+        valid_moves = self.find_valid_moves(board)
         print(valid_moves)
+        random_move_coords = random.choice(valid_moves)
         return random_move_coords
         
+    def finds_winning_moves_ai(self, board, current_player):
+        valid_moves = self.find_valid_moves(board)
+        for move in valid_moves:
+            test_board = copy.deepcopy(board)
+            test_board = game.make_move(move, test_board, current_player)
+            if self.get_winner(test_board) == f'{current_player} wins!':
+                return move
+        return self.random_ai(board, current_player)
+
+    def finds_winning_and_losing_moves_ai(self, board, current_player):
+        pass
         
 if __name__ == '__main__':
     game = TicTacToe()
     board = game.new_board()
-    
 
-    # board2 = [
-    #     [None,'X',None],
-    #     ['O','O','X'],
-    #     ['X','X',None]
-    # ]
-    # print(game.render(board2))
-    # print(board2[2][0])
-    # ai_move = game.random_ai(board2,'O')
-    # print(ai_move)
-    # board2 = game.make_move(ai_move,board2,'O')
-    # print(game.render(board2))
 
     while True:
         try:
             current_player = game.alternate_move()
-            move = game.random_ai(board, current_player)
+            move = game.finds_winning_moves_ai(board, current_player)
+            print(move)
             board = game.make_move(move, board, current_player)
             print(game.render(board))
             if game.get_winner(board) is not None:
