@@ -127,6 +127,9 @@ class TicTacToe:
             elif self.get_winner(test_board_offense) == f'{current_player} wins!':
                 return move
         return self.random_ai(board, current_player)
+    
+    def human_player(self, board, current_player):
+        return self.get_move()
         
 if __name__ == '__main__':
     game = TicTacToe()
@@ -136,8 +139,8 @@ if __name__ == '__main__':
     while True:
         try:
             current_player = game.alternate_move()
-            move = game.finds_winning_and_losing_moves_ai(board, current_player)
-            print(move)
+            move = game.human_player(board, current_player)
+            # print(move)
             board = game.make_move(move, board, current_player)
             print(game.render(board))
             if game.get_winner(board) is not None:
