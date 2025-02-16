@@ -1,4 +1,5 @@
 import copy
+import random
 class InvalidMoveError(Exception):
     def __init__(self, move_coords):
         self.move_coords = move_coords
@@ -24,7 +25,7 @@ class TicTacToe:
                 j += 1
             j = 0
             i += 1
-        rendered_board = '  | 0 | 1 | 2 \n ------------- \n 0| '+display_board[0][0]+' | '+display_board[1][0]+' | '+display_board[2][0] + '\n 1| '+display_board[0][1]+' | '+display_board[1][1]+' | '+display_board[2][1]+ '\n 2| '+display_board[0][2]+' | '+display_board[1][2]+' | '+display_board[2][2]
+        rendered_board = '  | 0 | 1 | 2 \n ------------- \n 0| '+display_board[0][0]+' | '+display_board[0][1]+' | '+display_board[0][2] + '\n 1| '+display_board[1][0]+' | '+display_board[1][1]+' | '+display_board[1][2]+ '\n 2| '+display_board[2][0]+' | '+display_board[2][1]+' | '+display_board[2][2]
         return rendered_board
 
     def get_move(self):
@@ -35,7 +36,7 @@ class TicTacToe:
         return (x_coord, y_coord)
 
     def is_valid_move(self, move_coords, board):
-        if board[move_coords[0]][move_coords[1]] == None:
+        if board[move_coords[1]][move_coords[0]] == None:
             return True
         else:
             return False
@@ -47,7 +48,7 @@ class TicTacToe:
             else:
                 raise InvalidMoveError(move_coords)
         new_board = board
-        new_board[move_coords[0]][move_coords[1]] = team
+        new_board[move_coords[1]][move_coords[0]] = team
         return new_board
 
     xo_count = 0
@@ -83,16 +84,44 @@ class TicTacToe:
             if len(none_moves) == 0:
                 return "Draw!"
         return None
+    
+    def random_ai(self, board, current_player):
+        valid_moves = []
+        i = 0
+        j = 0
+        for row in board:
+            for square in row:
+                if square is None:
+                    valid_moves.append((i,j))
+                i += 1
+            i = 0
+            j += 1
+        random_move_coords = random.choice(valid_moves)
+        print(valid_moves)
+        return random_move_coords
+        
         
 if __name__ == '__main__':
     game = TicTacToe()
     board = game.new_board()
-    print(game.render(board))
+    
+
+    # board2 = [
+    #     [None,'X',None],
+    #     ['O','O','X'],
+    #     ['X','X',None]
+    # ]
+    # print(game.render(board2))
+    # print(board2[2][0])
+    # ai_move = game.random_ai(board2,'O')
+    # print(ai_move)
+    # board2 = game.make_move(ai_move,board2,'O')
+    # print(game.render(board2))
 
     while True:
         try:
-            move = game.get_move()
             current_player = game.alternate_move()
+            move = game.random_ai(board, current_player)
             board = game.make_move(move, board, current_player)
             print(game.render(board))
             if game.get_winner(board) is not None:
