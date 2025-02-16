@@ -1,5 +1,6 @@
 import copy
 import random
+import pandas as pd
 class InvalidMoveError(Exception):
     def __init__(self, move_coords):
         self.move_coords = move_coords
@@ -100,7 +101,6 @@ class TicTacToe:
 
     def random_ai(self, board, current_player):
         valid_moves = self.find_valid_moves(board)
-        print(valid_moves)
         random_move_coords = random.choice(valid_moves)
         return random_move_coords
         
@@ -120,8 +120,8 @@ class TicTacToe:
             test_board_offense = copy.deepcopy(board)
             next_player = self.alternate_move()
             self.xo_count -= 1
-            test_board_defense = game.make_move(move, test_board_defense, next_player)
-            test_board_offense = game.make_move(move, test_board_offense, current_player)
+            test_board_defense = self.make_move(move, test_board_defense, next_player)
+            test_board_offense = self.make_move(move, test_board_offense, current_player)
             if self.get_winner(test_board_defense) == f'{next_player} wins!':
                 return move
             elif self.get_winner(test_board_offense) == f'{current_player} wins!':
@@ -130,28 +130,54 @@ class TicTacToe:
     
     def human_player(self, board, current_player):
         return self.get_move()
-        
+
 if __name__ == '__main__':
-    game = TicTacToe()
-    board = game.new_board()
 
 
-    while True:
-        try:
-            current_player = game.alternate_move()
-            move = game.human_player(board, current_player)
-            # print(move)
-            board = game.make_move(move, board, current_player)
-            print(game.render(board))
-            if game.get_winner(board) is not None:
-                print(game.get_winner(board))
-                print('Game over')
-                break
-            if game.check_draw(board) is not None:
-                print(game.check_draw(board))
-                print('Game over')
-                break
-        except InvalidMoveError as e:
-            print(f"Invalid move: {e} Please try again")
-            game.xo_count -= 1
-            continue
+    def play(strategy1, strategy2):
+        game = TicTacToe()
+        board = game.new_board()
+        while True:
+            try:
+                current_player = game.alternate_move()
+                if current_player == 'X':
+                    move = strategy1(game, board, current_player)
+                elif current_player == 'O':
+                    move = strategy2(game, board, current_player)
+                # print(move)
+                board = game.make_move(move, board, current_player)
+                print(game.render(board))
+                if game.get_winner(board) is not None:
+                    print(game.get_winner(board))
+                    print('Game over')
+                    if current_player == 'X':
+                        return 1 # Return 1 if strategy 1 wins
+                    elif current_player == 'O':
+                        return 2 # Return 2 if strategy 2 wins
+                if game.check_draw(board) is not None:
+                    print(game.check_draw(board))
+                    print('Game over')
+                    return 0 # Return 0 if draw
+            except InvalidMoveError as e:
+                print(f"Invalid move: {e} Please try again")
+                game.xo_count -= 1
+                continue
+    
+    def repeated_battle(strategy1, strategy2):
+        results = {'draw': 0, 'strategy_1': 0, 'strategy_2': 0}
+        results['draw'] = 0
+        results['strategy_1'] = 0
+        results['strategy_2'] = 0
+        for i in range(0, 1000):
+            result = play(strategy1, strategy2)
+            if result == 0:
+                results['draw'] += 1
+            elif result == 1:
+                results['strategy_1'] += 1
+            else:
+                results['strategy_2'] += 1
+        return results
+
+    outcome = repeated_battle(TicTacToe.finds_winning_and_losing_moves_ai, TicTacToe.random_ai)
+
+    print(outcome)
