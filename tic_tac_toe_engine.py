@@ -114,7 +114,19 @@ class TicTacToe:
         return self.random_ai(board, current_player)
 
     def finds_winning_and_losing_moves_ai(self, board, current_player):
-        pass
+        valid_moves = self.find_valid_moves(board)
+        for move in valid_moves:
+            test_board_defense = copy.deepcopy(board)
+            test_board_offense = copy.deepcopy(board)
+            next_player = self.alternate_move()
+            self.xo_count -= 1
+            test_board_defense = game.make_move(move, test_board_defense, next_player)
+            test_board_offense = game.make_move(move, test_board_offense, current_player)
+            if self.get_winner(test_board_defense) == f'{next_player} wins!':
+                return move
+            elif self.get_winner(test_board_offense) == f'{current_player} wins!':
+                return move
+        return self.random_ai(board, current_player)
         
 if __name__ == '__main__':
     game = TicTacToe()
@@ -124,7 +136,7 @@ if __name__ == '__main__':
     while True:
         try:
             current_player = game.alternate_move()
-            move = game.finds_winning_moves_ai(board, current_player)
+            move = game.finds_winning_and_losing_moves_ai(board, current_player)
             print(move)
             board = game.make_move(move, board, current_player)
             print(game.render(board))
